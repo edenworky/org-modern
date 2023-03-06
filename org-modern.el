@@ -481,9 +481,11 @@ the font.")
                                   (nth (logand i 1)
                                        org-modern--hide-stars-cache))))
     (when org-modern-star
-      (put-text-property end (1+ end) 'display
-                         (aref org-modern--star-cache
-                               (min (1- (length org-modern--star-cache)) level))))))
+      (put-text-property
+       (if (eq org-modern-hide-stars 'leading) beg end)
+       (1+ end) 'display
+       (aref org-modern--star-cache
+             (min (1- (length org-modern--star-cache)) level))))))
 
 (defun org-modern--table ()
   "Prettify vertical table lines."
@@ -658,11 +660,9 @@ the font.")
         (0 (org-modern--checkbox)))))
    (when (or org-modern-star org-modern-hide-stars)
      `(("^\\(\\**\\)\\* "
-        ,@(and (not (eq org-modern-hide-stars t))
-               (or org-modern-star (stringp org-modern-hide-stars))
-               '((0 (org-modern--star))))
-        ,@(and (eq org-modern-hide-stars 'leading) '((1 '(face nil invisible org-modern))))
-        ,@(and (eq org-modern-hide-stars t) '((0 '(face nil invisible org-modern)))))))
+        (0 ,(if (eq org-modern-hide-stars t)
+                ''(face nil invisible org-modern)
+              '(org-modern--star))))))
    (when org-modern-horizontal-rule
      `(("^[ \t]*-\\{5,\\}$" 0
         '(face org-modern-horizontal-rule display
